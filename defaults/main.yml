@@ -56,3 +56,12 @@ apache_restart_state: restarted
 # Apache package state; use `present` to make sure it's installed, or `latest`
 # if you want to upgrade or switch versions using a new repo.
 apache_packages_state: present
+
+# Apache configuration hardening.
+apache_hardening: false
+apache_servertokens: "Prod"
+apache_serversignature: "On"
+apache_traceenable: "Off"
+apache_deny_rootdir: true
+apache_deny_dirs: ".svn|.git"
+apache_deny_files: ".ht*|.env|.json|.config.js|.md|.git*|.lock|.yml|.yaml|README|.ini|.sh|.conf|.cnf"

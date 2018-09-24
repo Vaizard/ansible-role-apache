@@ -1,0 +1,59 @@
+---
+
+- name: Harden Apache configuration
+  lineinfile:
+    dest: /etc/apache2/conf-available/security.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - regexp: '^ServerTokens'
+      line: 'ServerTokens {{ apache_servertokens }}'
+    - regexp: '^ServerSignature'
+      line: 'ServerSignature {{ apache_serversignature }}'
+    - regexp: '^TraceEnable'
+      line: 'TraceEnable {{ apache_traceenable }}'
+  notify: restart apache
+
+- name: Deny access to root dir
+  blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED - Root dir"
+    dest: /etc/apache2/conf-available/security.conf
+    state: "{{ apache_deny_rootdir | ternary('present','absent') }}"
+    block: |
+      <Directory />
+         AllowOverride None
+         Require all denied
+      </Directory>
+  notify: restart apache
+
+- set_fact:
+    state_directorymatch: 'absent'
+  when: apache_deny_dirs == ''
+
+- set_fact:
+    state_filesmatch: 'absent'
+  when: apache_deny_files == ''
+
+- name: Deny access to dot dirs
+  blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED - DirectoryMatch"
+    dest: /etc/apache2/conf-available/security.conf
+    state: "{{ state_directorymatch | default('present') }}"
+    block: |
+      <DirectoryMatch "/({{ apache_deny_dirs | replace(".","\.") }})">
+         Require all denied
+      </DirectoryMatch>
+  notify: restart apache
+
+- name: Deny access to matching files
+  blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED - FileMatch"
+    dest: /etc/apache2/conf-available/security.conf
+    state: "{{ state_filesmatch | default('present') }}"
+    block: |
+      <FilesMatch "({{ apache_deny_files | replace(".","\.") }})">
+         Require all denied
+      </FilesMatch>
+  notify: restart apache
+

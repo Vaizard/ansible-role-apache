@@ -35,6 +35,10 @@
 # Configure Apache.
 - include_tasks: "configure-{{ ansible_os_family }}.yml"
 
+# Harden Apache.
+- include_tasks: "harden-{{ ansible_os_family }}.yml"
+  when: ansible_os_family == "Debian" and apache_hardening
+
 - name: Ensure Apache has selected state and enabled on boot.
   service:
     name: "{{ apache_service }}"
