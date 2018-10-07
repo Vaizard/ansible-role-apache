@@ -64,4 +64,4 @@ apache_serversignature: "On"
 apache_traceenable: "Off"
 apache_deny_rootdir: true
 apache_deny_dirs: ".svn|.git"
-apache_deny_files: ".ht*|.env|.json|.config.js|.md|.git*|.lock|.yml|.yaml|README|.ini|.sh|.conf|.cnf"
+apache_deny_files: ".htaccess|.htgroup|.htpasswd|.env|.json|.config.js|.md|.git*|.lock|.yml|.yaml|README|.ini|.sh|.conf|.cnf"
